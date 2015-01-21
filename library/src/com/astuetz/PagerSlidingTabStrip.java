@@ -89,6 +89,8 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
     private LinearLayout tabsContainer;
     private ViewPager pager;
 
+    private boolean mTabHostMode = false;
+
     private int tabCount;
 
     private int currentPosition = 0;
@@ -300,12 +302,34 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
         tabsContainer.addView(tabView, position, shouldExpand ? expandedTabLayoutParams : defaultTabLayoutParams);
     }
 
+    public void turnOnTabHostMode(boolean flag) {
+        // call before the setViewPager method as well
+        mTabHostMode = flag;
+    }
+
+    private void setTabHost(final FrameLayout tab_layout) {
+        if (mTabHostMode == false) {
+            return;
+        }
+        tab_layout.getViewTreeObserver().addOnGlobalLayoutListener(
+            new OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    tab_layout.getLayoutParams().width = getMeasureWidth() / tabCount;
+                    tab_layout.setLayoutParams(tab_layout.getLayoutParams());
+                }
+            }
+        );
+    }
+
     private void updateTabStyles() {
         for (int i = 0; i < tabCount; i++) {
             View v = tabsContainer.getChildAt(i);
             v.setBackgroundResource(tabBackgroundResId);
             v.setPadding(tabPadding, v.getPaddingTop(), tabPadding, v.getPaddingBottom());
             TextView tab_title = (TextView) v.findViewById(R.id.tab_title);
+
+            setTabHost((FrameLayout)v.findViewById(R.id.tab_layout));
 
             if (tab_title != null) {
                 tab_title.setTextSize(TypedValue.COMPLEX_UNIT_PX, tabTextSize);
