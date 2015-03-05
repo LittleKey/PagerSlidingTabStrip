@@ -49,6 +49,8 @@ import java.util.Locale;
 
 public class PagerSlidingTabStrip extends HorizontalScrollView {
 
+    private int mMaxTabCount = 0;
+
     public interface CustomTabProvider {
         public View getCustomTabView(ViewGroup parent, int position);
     }
@@ -299,6 +301,11 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
         mTabHostMode = flag;
     }
 
+    public void turnOnTabHostMode(boolean flag, int count) {
+        turnOnTabHostMode(flag);
+        mMaxTabCount = count;
+    }
+
     private void setTabHost(final FrameLayout tab_layout) {
         if (mTabHostMode == false) {
             return;
@@ -307,7 +314,8 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
             new OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    tab_layout.getLayoutParams().width = getMeasureWidth() / tabCount;
+                    int maxTabCount = mMaxTabCount != 0 && tabCount > mMaxTabCount ? mMaxTabCount : tabCount;
+                    tab_layout.getLayoutParams().width = getMeasureWidth() / maxTabCount;
                     tab_layout.setLayoutParams(tab_layout.getLayoutParams());
                 }
             }
